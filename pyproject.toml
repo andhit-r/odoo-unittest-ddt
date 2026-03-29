@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "odoo-unittest-ddt"
+version = "0.1.0"
+description = "DDT (Data-Driven Tests) helpers and mixins for Odoo unit testing"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "PT. Simetri Sinergi Indonesia" }]
+keywords = ["odoo", "unittest", "ddt", "testing", "data-driven", "yaml"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Testing",
+    "Framework :: Odoo",
+]
+requires-python = ">=3.8"
+dependencies = ["ddt>=1.6.0"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "build>=1.0",
+    "twine>=4.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/open-synergy/odoo-unittest-ddt"
+Repository = "https://github.com/open-synergy/odoo-unittest-ddt"
+"Bug Tracker" = "https://github.com/open-synergy/odoo-unittest-ddt/issues"
+Changelog = "https://github.com/open-synergy/odoo-unittest-ddt/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--tb=short -q"
+
+[tool.coverage.run]
+source = ["src/odoo_unittest_ddt"]
+
+[tool.coverage.report]
+show_missing = true
