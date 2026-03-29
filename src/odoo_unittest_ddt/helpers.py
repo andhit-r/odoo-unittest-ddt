@@ -47,3 +47,58 @@ def simulate_onchange_create(model_obj, values, onchange_methods=None):
         getattr(record, method_name)()
     write_values = record._convert_to_write(record._cache)
     return model_obj.create(write_values)
+
+
+def resolve_record_ids(test_instance, attribute, exclude_keys=None):
+    """Resolve ``*_name`` keys in *attribute* to Odoo record ``.id`` values.
+
+    A common YAML-driven test pattern stores fixture attribute names as
+    ``<field>_name`` (e.g. ``school_name: "school"``) instead of raw IDs so
+    that the scenario files stay human-readable.  This helper converts those
+    entries into the ``<field>_id`` integers that Odoo ``create()`` expects,
+    by looking up ``getattr(test_instance, value).id`` for every key that ends
+    with ``"_name"``.
+
+    Keys in *exclude_keys* are dropped from the result entirely — useful for
+    meta-keys such as ``"user"`` or ``"description"`` that exist only for
+    scenario bookkeeping and must not reach ``create()``.
+
+    ``_name`` entries whose value is falsy (``None``, ``""``, etc.) are silently
+    skipped so that optional relation fields can be omitted from a scenario
+    without raising an ``AttributeError``.
+
+    All other keys are passed through unchanged (e.g. plain scalar fields such
+    as ``date``).
+
+    :param test_instance:
+        The test instance — ``self`` inside a test method.
+    :param dict attribute:
+        Attribute dict, typically the ``attribute`` value from a
+        ``@file_data`` YAML scenario.
+    :param list[str] exclude_keys:
+        Keys to omit from the result entirely.  Defaults to ``None`` (nothing
+        excluded).
+    :returns:
+        A new ``dict`` ready to be passed to ``env["model.name"].create()``.
+
+    **Example**::
+
+        def _create_enrollment(self, attribute):
+            vals = resolve_record_ids(
+                self, attribute, exclude_keys=["user", "description"]
+            )
+            vals["currency_id"] = self.env.company.currency_id.id
+            return self.env["school_enrollment"].create(vals)
+    """
+    exclude_keys = set(exclude_keys or [])
+    result = {}
+    for key, value in attribute.items():
+        if key in exclude_keys:
+            continue
+        if key.endswith("_name"):
+            if value:  # skip falsy — optional relation not set in this scenario
+                id_key = key[:-5] + "_id"
+                result[id_key] = getattr(test_instance, value).id
+        else:
+            result[key] = value
+    return result

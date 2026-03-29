@@ -40,7 +40,7 @@ Typical usage in an Odoo test module::
 
 from ddt import data, ddt, file_data, unpack
 
-from .helpers import simulate_onchange_create
+from .helpers import resolve_record_ids, simulate_onchange_create
 from .mixins import OdooScenarioMixin, PolicyScenarioMixin, WorkflowScenarioMixin
 
 __version__ = "0.1.0"
@@ -53,6 +53,7 @@ __all__ = [
     "unpack",
     # helpers
     "simulate_onchange_create",
+    "resolve_record_ids",
     # mixins
     "OdooScenarioMixin",
     "WorkflowScenarioMixin",
